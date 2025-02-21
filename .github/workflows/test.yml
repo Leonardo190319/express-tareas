@@ -7,14 +7,24 @@ on:
 
 jobs:
   decir-hola:
-    
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: read
+      packages: write
+    environment: produccion
     steps:
       - name: Mostrar mensaje
-        run: echo "Hola Mundo"
+        run: echo "Hola mundo"
       - name: Enviar Peticion
         run: |
           curl -X POST 'https://webhook.site/892f2749-aba3-44c8-af63-04640edf7a85' \
           -H 'content-type: application/json' \
           -d '{"nombre": "Leonardo"}'
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Logearnos en GHCR
+        run: echo "${{ secrets.TOKEN }}" | docker login ghcr.io -u Leonardo190319 --password-stdin
+      - name: Crear imagen
+        run: docker build . -t ghcr.io/Leonardo190319/express-image:latest
+      - name: Desplegar imagen
+        run: docker push ghcr.io/Leonardo190319/express-image:latest
